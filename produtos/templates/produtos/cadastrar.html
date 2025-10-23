@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+
+{% block title %}Cadastrar Produto{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+
+  <div class="text-center mb-4">
+    <h2 class="fw-bold">🛒 Cadastro de Produto</h2>
+    <p class="text-muted">Adicione novos produtos ao sistema PDV de forma rápida</p>
+  </div>
+
+  <!-- Card de cadastro -->
+  <div class="card shadow-sm border-0 rounded-4">
+    <div class="card-header bg-primary text-white fw-bold rounded-top-4 d-flex justify-content-between align-items-center">
+      <span>Cadastro de Produto</span>
+      <div>
+        <a href="{% url 'listar_produtos' %}" class="btn btn-light btn-sm me-1">Ver Produtos</a>
+        <a href="{% url 'listar_clientes' %}" class="btn btn-light btn-sm me-1">Ver Clientes</a>
+        <a href="{% url 'listar_fornecedores' %}" class="btn btn-light btn-sm">Fornecedores</a>
+      </div>
+    </div>
+    <div class="card-body">
+      
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="POST" id="form-produto">
+        {% csrf_token %}
+
+        <!-- Campos do formulário -->
+        {% for field in form %}
+          <div class="mb-3">
+            <label for="{{ field.id_for_label }}" class="form-label fw-bold">{{ field.label }}</label>
+            {{ field|add_class:"form-control" }}
+            {% if field.errors %}
+              <div class="text-danger mt-1 small">
+                {{ field.errors|striptags }}
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+
+        <div class="text-center mt-4">
+          <button type="submit" class="btn btn-success btn-lg px-5 fw-bold">💾 Cadastrar Produto</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Manter usuário na mesma página após cadastro
+document.getElementById('form-produto').addEventListener('submit', function(event) {
+    event.preventDefault(); // evita reload
+
+    const form = this;
+    const data = new FormData(form);
+
+    fetch(form.action, {
+        method: 'POST',
+        body: data,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.text())
+    .then(html => {
+        document.body.innerHTML = html;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    })
+    .catch(error => console.error('Erro ao cadastrar:', error));
+});
+</script>
+
+{% endblock %}

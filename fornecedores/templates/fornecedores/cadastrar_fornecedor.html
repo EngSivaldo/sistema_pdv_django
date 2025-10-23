@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Cadastrar Fornecedor{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="text-center mb-4">
+    <h2 class="fw-bold">Cadastrar Fornecedor</h2>
+    <p class="text-muted">Adicione novos fornecedores ao sistema</p>
+  </div>
+
+  <form method="POST">
+    {% csrf_token %}
+
+    {% for field in form %}
+      <div class="mb-3">
+        <label for="{{ field.id_for_label }}" class="form-label fw-bold">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}
+          <div class="text-danger small">{{ field.errors }}</div>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+    <div class="d-flex justify-content-between mt-4">
+      <button type="submit" class="btn btn-success fw-bold">💾 Cadastrar</button>
+      <a href="{% url 'listar_fornecedores' %}" class="btn btn-secondary fw-bold">🔙 Voltar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

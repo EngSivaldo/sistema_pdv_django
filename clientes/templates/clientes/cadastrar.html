@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Cadastrar Cliente{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+
+  <div class="text-center mb-4">
+    <h2 class="fw-bold">📝 Cadastro de Cliente</h2>
+    <p class="text-muted">Registre um novo cliente de forma rápida e prática</p>
+  </div>
+
+  <div class="card shadow-sm border-0 rounded-4">
+    <div class="card-header bg-primary text-white fw-bold rounded-top-4">
+      Informações do Cliente
+    </div>
+    <div class="card-body">
+
+      <form method="POST">
+        {% csrf_token %}
+
+        {% for field in form %}
+          <div class="mb-3">
+            <label for="{{ field.id_for_label }}" class="form-label fw-bold">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+              <div class="text-danger mt-1 small">
+                {{ field.errors|striptags }}
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+
+        <div class="d-flex justify-content-between mt-4">
+          <a href="{% url 'listar_clientes' %}" class="btn btn-secondary">🔙 Voltar</a>
+          <button type="submit" class="btn btn-success fw-bold">💾 Cadastrar Cliente</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

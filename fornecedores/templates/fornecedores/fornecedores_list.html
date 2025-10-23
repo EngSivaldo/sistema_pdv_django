@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Fornecedores{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold">📦 Fornecedores</h1>
+        <a href="{% url 'cadastrar_fornecedor' %}" class="btn btn-success fw-bold">➕ Novo Fornecedor</a>
+    </div>
+
+    <div class="row g-4">
+        {% for fornecedor in fornecedores %}
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100 border-0 rounded-4">
+                <div class="card-body">
+                    <h5 class="card-title">{{ fornecedor.nome }}</h5>
+                    <p class="card-text mb-1"><strong>Telefone:</strong> {{ fornecedor.telefone|default:"-" }}</p>
+                    <p class="card-text mb-3"><strong>Email:</strong> {{ fornecedor.email|default:"-" }}</p>
+                    <div class="d-flex justify-content-between">
+                        <!-- Adicionamos confirm-link e data-message (não altera aparência) -->
+                        <a href="{% url 'editar_fornecedor' fornecedor.id %}"
+                           class="btn btn-sm btn-warning confirm-link"
+                           data-message="Deseja editar o fornecedor &quot;{{ fornecedor.nome }}&quot;?">
+                           ✏️ Editar
+                        </a>
+
+                        <a href="{% url 'excluir_fornecedor' fornecedor.id %}"
+                           class="btn btn-sm btn-danger confirm-link"
+                           data-message="Tem certeza que deseja excluir o fornecedor &quot;{{ fornecedor.nome }}&quot;? Esta ação não pode ser desfeita.">
+                           🗑️ Excluir
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-secondary text-center">
+                Nenhum fornecedor cadastrado.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Modal de confirmação (Bootstrap) - mantém estilo do projeto -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 shadow-sm">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmModalLabel">Atenção</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body" id="confirmModalBody">
+        <!-- mensagem será injetada pelo JS -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-danger btn-sm" id="confirmModalConfirmBtn">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // bootstrap modal instance
+  const confirmModalEl = document.getElementById('confirmModal');
+  const confirmModal = new bootstrap.Modal(confirmModalEl, { keyboard: false });
+  const confirmBody = document.getElementById('confirmModalBody');
+  const confirmBtn = document.getElementById('confirmModalConfirmBtn');
+
+  let targetHref = null;
+  let targetMethod = 'get'; // default
+
+  // Ao clicar em qualquer link com classe confirm-link
+  document.querySelectorAll('.confirm-link').forEach(function(el) {
+    el.addEventListener('click', function(e) {
+      e.preventDefault();
+
+      // mensagem customizada no data-message, se não existir usa texto padrão
+      const message = el.dataset.message || 'Deseja continuar com esta ação?';
+      confirmBody.textContent = message;
+
+      // guarda o href alvo e método (se quiser suportar POST, adicione data-method="post")
+      targetHref = el.getAttribute('href');
+      targetMethod = el.dataset.method ? el.dataset.method.toLowerCase() : 'get';
+
+      // mostra o modal
+      confirmModal.show();
+    });
+  });
+
+  // Botão confirmar do modal
+  confirmBtn.addEventListener('click', function() {
+    confirmModal.hide();
+
+    if (!targetHref) return;
+
+    if (targetMethod === 'post') {
+      // Se você quiser que a exclusão seja por POST (mais seguro), criaremos um form e submeteremos
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = targetHref;
+      // adiciona token CSRF automaticamente via cookie não é seguro — se quiser POST, implemente view que aceite POST e inclua {% csrf_token %} via template
+      // Melhor abordagem: faça o delete via view que aceita GET (conforme seu projeto atual) ou implemente fetch + header X-CSRFToken.
+      document.body.appendChild(form);
+      form.submit();
+    } else {
+      // GET padrão — redireciona para a URL (mantém comportamento atual)
+      window.location.href = targetHref;
+    }
+  });
+});
+</script>
+
+{% endblock %}

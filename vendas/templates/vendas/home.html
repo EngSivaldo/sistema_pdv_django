@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}Home PDV{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="text-center mb-5">
+        <h1 class="fw-bold">📊 Bem-vindo ao PDV</h1>
+        <p class="text-muted">Resumo rápido do sistema</p>
+    </div>
+
+    <div class="row g-4 text-center">
+        
+      <!-- Vendas -->
+<div class="col-md-3">
+    <div class="card shadow-lg h-100 border-0 rounded-4 hover-scale border-success">
+        <div class="card-header bg-success text-white fw-bold rounded-top-4">
+            💵 Vendas
+        </div>
+        <div class="card-body d-flex flex-column justify-content-center align-items-center">
+            <p class="display-5 fw-bold mb-3">{{ total_vendas }}</p>
+            <div class="d-flex gap-2">
+                <a href="{% url 'listar_vendas' %}" class="btn btn-outline-light btn-sm">📋 Listar</a>
+                <a href="{% url 'fazer_venda' %}" class="btn btn-light btn-sm">➕ Nova Venda</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+        <!-- Produtos -->
+        <div class="col-md-3">
+            <div class="card shadow-lg h-100 border-0 rounded-4 hover-scale">
+                <div class="card-body">
+                    <h5 class="card-title">📦 Produtos</h5>
+                    <p class="display-6 fw-bold">{{ total_produtos }}</p>
+                    <a href="{% url 'listar_produtos' %}" class="btn btn-outline-primary me-1">Listar</a>
+                    <a href="{% url 'cadastrar_produto' %}" class="btn btn-outline-success">Cadastrar</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Clientes -->
+        <div class="col-md-3">
+            <div class="card shadow-lg h-100 border-0 rounded-4 hover-scale">
+                <div class="card-body">
+                    <h5 class="card-title">👤 Clientes</h5>
+                    <p class="display-6 fw-bold">{{ total_clientes }}</p>
+                    <a href="{% url 'listar_clientes' %}" class="btn btn-outline-primary me-1">Listar</a>
+                    <a href="{% url 'cadastrar_cliente' %}" class="btn btn-outline-success">Cadastrar</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fornecedores -->
+        <div class="col-md-3">
+            <div class="card shadow-lg h-100 border-0 rounded-4 hover-scale">
+                <div class="card-body">
+                    <h5 class="card-title">🏭 Fornecedores</h5>
+                    <p class="display-6 fw-bold">{{ total_fornecedores }}</p>
+                    <a href="{% url 'listar_fornecedores' %}" class="btn btn-outline-primary me-1">Listar</a>
+                    <a href="{% url 'cadastrar_fornecedor' %}" class="btn btn-outline-success">Cadastrar</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+.hover-scale {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.hover-scale:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+}
+</style>
+{% endblock %}

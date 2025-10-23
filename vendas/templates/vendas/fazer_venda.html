@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}Fazer Venda{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+
+  <div class="text-center mb-4">
+    <h2 class="fw-bold">💵 Sistema de Venda (PDV)</h2>
+    <p class="text-muted">Registre suas vendas de forma rápida e prática</p>
+  </div>
+
+  <form method="POST">
+    {% csrf_token %}
+
+    <!-- Cliente -->
+    <div class="card mb-4 shadow-sm border-0 rounded-4">
+      <div class="card-header bg-primary text-white fw-bold rounded-top-4">
+        Cliente
+      </div>
+      <div class="card-body">
+        <select name="cliente" class="form-select" required>
+          <option value="">Selecione o cliente...</option>
+          {% for cliente in clientes %}
+            <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <!-- Produtos -->
+    <div class="card mb-4 shadow-sm border-0 rounded-4">
+      <div class="card-header bg-info text-white fw-bold rounded-top-4">
+        Produtos
+      </div>
+      <div class="card-body">
+        <table class="table table-bordered align-middle text-center mb-3 rounded-3">
+          <thead class="table-light">
+            <tr>
+              <th>Produto</th>
+              <th>Preço Unitário</th>
+              <th>Quantidade</th>
+              <th>Subtotal</th>
+              <th>Remover</th>
+            </tr>
+          </thead>
+          <tbody id="produtos-lista">
+            <tr class="produto-item">
+              <td>
+                <select name="produto" class="form-select produto-select" required>
+                  <option value="">Selecione...</option>
+                  {% for produto in produtos %}
+                    <option value="{{ produto.id }}" data-preco="{{ produto.preco }}">
+                      {{ produto.nome }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td class="preco">R$ 0,00</td>
+              <td><input type="number" name="quantidade" class="form-control quantidade-input" value="1" min="1"></td>
+              <td class="subtotal">R$ 0,00</td>
+              <td>
+                <button type="button" class="btn btn-danger btn-sm btn-remover">✖</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <button type="button" id="adicionar-produto" class="btn btn-secondary">+ Adicionar Produto</button>
+      </div>
+    </div>
+
+    <!-- Total -->
+    <div class="card mb-4 shadow-sm border-0 rounded-4">
+      <div class="card-body text-center">
+        <h4 class="fw-bold">Total da Venda: <span id="total-geral">R$ 0,00</span></h4>
+      </div>
+    </div>
+
+    <!-- Finalizar -->
+    <div class="text-center mb-5">
+      <button type="submit" class="btn btn-success btn-lg px-5 fw-bold">
+        💾 Finalizar Venda
+      </button>
+    </div>
+
+  </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const lista = document.getElementById('produtos-lista');
+  const botaoAdicionar = document.getElementById('adicionar-produto');
+  const totalGeral = document.getElementById('total-geral');
+
+  function atualizarTotal() {
+    let total = 0;
+    document.querySelectorAll('.produto-item').forEach(item => {
+      const select = item.querySelector('.produto-select');
+      const preco = parseFloat(select.selectedOptions[0]?.dataset.preco || 0);
+      const qtd = parseFloat(item.querySelector('.quantidade-input').value || 0);
+      const subtotal = preco * qtd;
+      item.querySelector('.subtotal').textContent = `R$ ${subtotal.toFixed(2)}`;
+      item.querySelector('.preco').textContent = `R$ ${preco.toFixed(2)}`;
+      total += subtotal;
+    });
+    totalGeral.textContent = `R$ ${total.toFixed(2)}`;
+  }
+
+  // Atualizar quando muda produto ou quantidade
+  lista.addEventListener('change', atualizarTotal);
+  lista.addEventListener('input', atualizarTotal);
+
+  // Adicionar nova linha
+  botaoAdicionar.addEventListener('click', () => {
+    const novo = lista.querySelector('.produto-item').cloneNode(true);
+    novo.querySelector('.produto-select').value = "";
+    novo.querySelector('.quantidade-input').value = 1;
+    novo.querySelector('.subtotal').textContent = "R$ 0,00";
+    novo.querySelector('.preco').textContent = "R$ 0,00";
+    lista.appendChild(novo);
+  });
+
+  // Remover linha
+  lista.addEventListener('click', e => {
+    if (e.target.classList.contains('btn-remover') && document.querySelectorAll('.produto-item').length > 1) {
+      e.target.closest('.produto-item').remove();
+      atualizarTotal();
+    }
+  });
+
+  atualizarTotal();
+});
+</script>
+{% endblock %}
